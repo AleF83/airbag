@@ -1,0 +1,43 @@
+version: '3.4'
+services:
+  airbag:
+    build: ../src
+    container_name: airbag
+    depends_on:
+      - user-service
+      - oidc-server-mock
+    volumes:
+      - "./data/airbag-config.json:/app/data/airbag-config.json:ro"
+
+  user-service:
+    image: clue/json-server
+    container_name: user-service
+    command: server.json
+    volumes:
+      - "./data/server.json:/data/server.json:ro"
+    logging:
+      driver: none
+
+  oidc-server-mock:
+    image: soluto/oidc-server-mock
+    container_name: oidc-server-mock
+    environment:
+      - CLIENT_CREDENTIALS_CLIENT_ID=client-credentials-mock-client
+      - CLIENT_CREDENTIALS_CLIENT_SECRET=client-credentials-mock-client-secret
+      - API_RESOURCE=user-service
+    logging:
+      driver: none
+
+  e2e:
+    build: .
+    container_name: e2e
+    depends_on:
+      - airbag
+      - oidc-server-mock
+    environment:
+      - OIDC_TOKEN_URL=http://oidc-server-mock/connect/token
+      - CLIENT_CREDENTIALS_CLIENT_ID=client-credentials-mock-client
+      - CLIENT_CREDENTIALS_CLIENT_SECRET=client-credentials-mock-client-secret
+      - API_RESOURCE=user-service
+      - AIRBAG_URL=http://airbag
+
