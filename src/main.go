@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
+	"os"
 
 	"github.com/AleF83/airbag/config"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/AleF83/airbag/middleware"
 	"github.com/justinas/alice"
 	"github.com/rs/cors"
@@ -15,6 +16,11 @@ import (
 )
 
 func main() {
+	log.SetFormatter(&log.TextFormatter{})
+	log.SetOutput(os.Stdout)
+	log.SetLevel(log.WarnLevel)
+
+
 	cfg, err := config.Init()
 	if err != nil {
 		log.Fatalf("Failed to init configuration: %v", err)

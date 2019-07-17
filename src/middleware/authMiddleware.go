@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"regexp"
 
@@ -11,6 +10,7 @@ import (
 	jwkfetch "github.com/AleF83/fetch-jwk"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/dgrijalva/jwt-go/request"
+	log "github.com/sirupsen/logrus"
 )
 
 // NewAuthMiddleware creates new auth middleware
@@ -27,29 +27,29 @@ func NewAuthMiddleware(providers []config.JWTProvider, unauthenticatedPaths []*r
 			token, err := request.ParseFromRequest(r, request.AuthorizationHeaderExtractor, jwkfetch.FromIssuerClaim)
 			if err != nil {
 				if err == jwt.ErrSignatureInvalid {
-					log.Printf("Error while validating request JWT: %v\n", err)
+					log.WithError(err).Error("Error while validating request JWT")
 					w.WriteHeader(http.StatusUnauthorized)
 					return
 				}
 
 				if err == request.ErrNoTokenInRequest {
-					log.Printf("Error while validating request JWT: %v\n", err)
+					log.WithError(err).Error("Error while validating request JWT")
 					w.WriteHeader(http.StatusUnauthorized)
 					return
 				}
-				log.Printf("Error while validating request JWT: %v\n", err)
+				log.WithError(err).Error("Error while validating request JWT")
 				w.WriteHeader(http.StatusBadRequest)
 				return
 			}
 			if !token.Valid {
-				log.Print("Error while validating request JWT: token is invalid.\n")
+				log.Error("Error while validating request JWT: token is invalid.")
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
 
 			err = validate(token, providers)
 			if err != nil {
-				log.Printf("Error while validating request JWT: %v\n", err)
+				log.WithError(err).Error("Error while validating request JWT")
 				w.WriteHeader(http.StatusUnauthorized)
 				return
 			}
