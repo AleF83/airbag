@@ -11,7 +11,7 @@ import (
 // JWTProvider stores pair iss and aud
 type JWTProvider struct {
 	Issuer   string `mapstructure:"iss"`
-	JWKURL	 string `mapstructure:"jwks_url"`
+	JWKURL   string `mapstructure:"jwks_url"`
 	Audience string `mapstructure:"aud"`
 }
 
@@ -44,7 +44,6 @@ func Init() (*Config, error) {
 		unAuthPaths[i] = regexp.MustCompile(str)
 	}
 
-
 	var providers []JWTProvider
 	err = viper.UnmarshalKey("JWTProviders", &providers)
 	if err != nil {
@@ -52,9 +51,9 @@ func Init() (*Config, error) {
 	}
 
 	cfg := &Config{
-		Port:       80,
-		BackendURL: backendURL,
-		JWTProviders: providers,
+		Port:                 80, // TODO: get from env
+		BackendURL:           backendURL,
+		JWTProviders:         providers,
 		UnauthenticatedPaths: unAuthPaths,
 	}
 	return cfg, nil

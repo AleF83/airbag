@@ -22,9 +22,25 @@ services:
     image: soluto/oidc-server-mock
     container_name: oidc-server-mock
     environment:
-      - CLIENT_CREDENTIALS_CLIENT_ID=client-credentials-mock-client
-      - CLIENT_CREDENTIALS_CLIENT_SECRET=client-credentials-mock-client-secret
-      - API_RESOURCE=user-service
+      CLIENTS_CONFIGURATION_INLINE: |
+        [
+          {
+            "ClientId": "client-credentials-mock-client",
+            "ClientSecrets": [
+              "client-credentials-mock-client-secret"
+            ],
+            "AllowedGrantTypes": [
+              "client_credentials"
+            ],
+            "AllowedScopes": [
+              "user-service"
+            ]
+          }
+        ]
+      API_RESOURCES_INLINE: |
+        [
+          "user-service"
+        ]
     logging:
       driver: none
 
