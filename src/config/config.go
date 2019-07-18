@@ -3,7 +3,10 @@ package config
 import (
 	"fmt"
 	"net/url"
+	"os"
 	"regexp"
+	"strconv"
+	"strings"
 
 	"github.com/spf13/viper"
 )
@@ -25,9 +28,20 @@ type Config struct {
 
 // Init - initializes configuration
 func Init() (*Config, error) {
+	viper.AutomaticEnv()
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	if configEnvPrefix, ok := os.LookupEnv("AIRBAG_CONFIG_ENV_PREFIX"); ok {
+		viper.SetPrefix(configEnvPrefix)
+	}
 
-	viper.SetConfigName("airbag-config")
-	viper.AddConfigPath("/app/data/")
+	if configName, ok := os.LookupEnv("AIRBAG_CONFIG_NAME"); ok {
+		viper.SetConfigName(configName)
+	}
+
+	if configPath, ok := os.LookupEnv("AIRBAG_CONFIG_PATH"); ok {
+		viper.AddConfigPath(configPath)
+	}
+
 	err := viper.ReadInConfig()
 	if err != nil {
 		return nil, err
@@ -50,8 +64,15 @@ func Init() (*Config, error) {
 		return nil, fmt.Errorf("Error while parsing JWTProviders : %v", err)
 	}
 
+	port := 80
+	if customPort, ok := os.LookupEnv("AIRBAG_PORT"); ok {
+		if port, err = strconv.Atoi(customPort); err != nil {
+			return nil, fmt.Errorf("Error while getting port from AIRBAG_PORT env variable: %v", err)
+		}
+	}
+
 	cfg := &Config{
-		Port:                 80, // TODO: get from env
+		Port:                 port,
 		BackendURL:           backendURL,
 		JWTProviders:         providers,
 		UnauthenticatedPaths: unAuthPaths,
