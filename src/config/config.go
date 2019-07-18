@@ -31,7 +31,7 @@ func Init() (*Config, error) {
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	if configEnvPrefix, ok := os.LookupEnv("AIRBAG_CONFIG_ENV_PREFIX"); ok {
-		viper.SetPrefix(configEnvPrefix)
+		viper.SetEnvPrefix(configEnvPrefix)
 	}
 
 	if configName, ok := os.LookupEnv("AIRBAG_CONFIG_NAME"); ok {

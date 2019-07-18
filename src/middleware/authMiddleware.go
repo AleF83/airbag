@@ -7,7 +7,7 @@ import (
 
 	"github.com/AleF83/airbag/config"
 
-	jwkfetch "github.com/AleF83/fetch-jwk"
+	jwkfetch "github.com/Soluto/fetch-jwk"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/dgrijalva/jwt-go/request"
 	log "github.com/sirupsen/logrus"
@@ -24,7 +24,7 @@ func NewAuthMiddleware(providers []config.JWTProvider, unauthenticatedPaths []*r
 				return
 			}
 
-			token, err := request.ParseFromRequest(r, request.AuthorizationHeaderExtractor, jwkfetch.FromIssuerClaim)
+			token, err := request.ParseFromRequest(r, request.AuthorizationHeaderExtractor, jwkfetch.FromIssuerClaim())
 			if err != nil {
 				if err == jwt.ErrSignatureInvalid {
 					log.WithError(err).Error("Error while validating request JWT")

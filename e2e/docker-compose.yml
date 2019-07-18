@@ -6,6 +6,10 @@ services:
     depends_on:
       - user-service
       - oidc-server-mock
+    environment:
+      - AIRBAG_PORT=80
+      - AIRBAG_CONFIG_NAME=airbag-config
+      - AIRBAG_CONFIG_PATH=/app/data
     volumes:
       - "./data/airbag-config.json:/app/data/airbag-config.json:ro"
 
