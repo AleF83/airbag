@@ -72,10 +72,10 @@ kind: Service
 apiVersion: v1
 metadata:
   name: my-service
-  namespace: user-namespace
+  namespace: my-namespace
 spec:
   selector:
-    app: user-service
+    app: my-service
   ports:
     - name: https
       port: 443
