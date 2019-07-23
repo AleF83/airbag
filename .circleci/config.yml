@@ -1,0 +1,82 @@
+version: 2.1
+
+commands:
+  build_image:
+    description: Builds image
+    parameters:
+      imageName:
+        type: string
+      workingDirectory:
+        type: string
+
+    steps:
+      - checkout
+      - run:
+          name: Build image
+          working_directory: << parameters.workingDirectory >>
+          command: docker build -t soluto/<< parameters.imageName >> --build-arg target=PRODUCTION .
+
+      - run:
+          name: Save image to fs
+          working_directory: /tmp
+          command: |
+            mkdir -p airbag
+            docker save -o airbag/<< parameters.imageName >>.tar << parameters.imageName >>
+
+      - persist_to_workspace:
+          root: /tmp/airbag
+          paths:
+            - << parameters.imageName >>.tar
+
+jobs:
+  build_airbag:
+    machine:
+      image: ubuntu-1604:201903-01
+
+    steps:
+      - build_image:
+          imageName: airbag
+          workingDirectory: ./src
+
+  build_e2e:
+    machine:
+      image: ubuntu-1604:201903-01
+
+    steps:
+      - build_image:
+          imageName: e2e
+          workingDirectory: ./e2e
+
+  run_tests:
+    machine:
+      image: ubuntu-1604:201903-01
+
+    steps:
+      - checkout
+
+      - attach_workspace:
+          at: /tmp/airbag
+
+      - run:
+          name: Load docker images from fs
+          working_directory: /tmp/airbag
+          command: |
+            docker load < airbag.tar
+            docker load < e2e.tar
+
+      - run:
+          name: Run E2E tests
+          working_directory: e2e
+          command: scripts/run_tests.sh
+
+workflows:
+  version: 2
+
+  build_n_test:
+    jobs:
+      - build_airbag
+      - build_e2e
+      - run_tests:
+          requires:
+            - build_airbag
+            - build_e2e

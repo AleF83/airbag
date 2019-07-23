@@ -1,8 +1,0 @@
-{
-    "authenticated": {
-        "data": "Welcome to secured route!"
-    },
-    "unauthenticated": {
-        "data": "Welcome to public route!"
-    }
-}

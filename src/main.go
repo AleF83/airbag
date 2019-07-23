@@ -30,7 +30,7 @@ func main() {
 	myApp := http.HandlerFunc(newProxy(cfg.BackendURL))
 	middlewares := alice.New(
 		cors.Default().Handler,
-		middleware.NewAuthMiddleware(cfg.JWTProviders, cfg.UnauthenticatedPaths),
+		middleware.NewAuthMiddleware(cfg.JWTProviders, cfg.UnauthenticatedRoutes),
 	).Then(myApp)
 	http.ListenAndServe(fmt.Sprintf(":%v", cfg.Port), middlewares)
 }

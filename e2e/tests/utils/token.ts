@@ -11,7 +11,7 @@ export const getToken = async (): Promise<string> => {
         scope: API_RESOURCE,
     };
 
-    const response = await axios.post(process.env.OIDC_TOKEN_URL, querystring.stringify(params));
+    const response = await axios.post(process.env.TOKEN_ENDPOINT, querystring.stringify(params));
     const accessToken = response.data.access_token;
     return accessToken as string;
 };

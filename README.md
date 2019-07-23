@@ -89,7 +89,8 @@ metadata:
 data:
   airbag-config.json: |
         {
-          "backend": "http://localhost:8080",
+          "BackendHostName": "localhost"
+          "BackendServicePort": 8080,
           "JWTProviders": [
               {
                   "iss": "http://issuer.com/connect/token",
