@@ -1,17 +1,16 @@
 import axios from "axios";
 import { expect } from "chai";
-import * as fs from "fs";
 
 describe("unauthenticated routes", () => {
     let expectedData: any;
 
     before(async () => {
-        const fileContent = await fs.promises.readFile("../data/server.json", { encoding: "utf8" });
-        expectedData = JSON.parse(fileContent).unauthenticated;
+        expectedData = { data: "Welcome to public route!" };
     });
 
     it("should return result", async () => {
-        const result = await axios.get(`${process.env.AIRBAG_URL}/unauthenticated`);
+        const url = `${process.env.SERVICE_URL}/unauthenticated`;
+        const result = await axios.get(url);
 
         // tslint:disable-next-line:no-unused-expression
         expect(result).to.exist;

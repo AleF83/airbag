@@ -1,6 +1,5 @@
 import axios from "axios";
 import { expect } from "chai";
-import * as fs from "fs";
 
 import { getToken } from "./utils/token";
 
@@ -10,8 +9,7 @@ describe("authenticated routes", () => {
     let expectedData: any;
 
     before(async () => {
-        const fileContent = await fs.promises.readFile("../data/server.json", { encoding: "utf8" });
-        expectedData = JSON.parse(fileContent).authenticated;
+        expectedData = { data: "Welcome to secured route!" };
 
         axios.interceptors.response.use((response) => response, (error) => error.response);
     });
@@ -21,11 +19,14 @@ describe("authenticated routes", () => {
     });
 
     it("should return result", async () => {
-        const result = await axios.get(`${process.env.AIRBAG_URL}/authenticated`, {
+        const url = `${process.env.SERVICE_URL}/authenticated`;
+        const options = {
             headers: {
                 Authorization: `Bearer ${accessToken}`,
             },
-        });
+        };
+
+        const result = await axios.get(url, options);
 
         // tslint:disable-next-line:no-unused-expression
         expect(result).to.exist;
@@ -36,7 +37,8 @@ describe("authenticated routes", () => {
     });
 
     it("should return status Unauthorized", async () => {
-        const result = await axios.get(`${process.env.AIRBAG_URL}/authenticated`);
+        const url = `${process.env.SERVICE_URL}/authenticated`;
+        const result = await axios.get(url);
 
         // tslint:disable-next-line:no-unused-expression
         expect(result).to.exist;

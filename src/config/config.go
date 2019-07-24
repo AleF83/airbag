@@ -20,16 +20,16 @@ type JWTProvider struct {
 
 // Config stores app config
 type Config struct {
-	Port                 int
-	BackendURL           *url.URL
-	JWTProviders         []JWTProvider
-	UnauthenticatedPaths []*regexp.Regexp
+	Port                  int
+	BackendURL            *url.URL
+	JWTProviders          []JWTProvider
+	UnauthenticatedRoutes []*regexp.Regexp
 }
 
 // Init - initializes configuration
 func Init() (*Config, error) {
 	viper.AutomaticEnv()
-	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "__"))
 	if configEnvPrefix, ok := os.LookupEnv("AIRBAG_CONFIG_ENV_PREFIX"); ok {
 		viper.SetEnvPrefix(configEnvPrefix)
 	}
@@ -47,12 +47,23 @@ func Init() (*Config, error) {
 		return nil, err
 	}
 
-	backendURL, err := url.Parse(viper.GetString("backend"))
+	// BackendHostName
+	viper.SetDefault("BackendHostName", "localhost")
+	viper.BindEnv("BackendHostName", "AIRBAG_BACKEND_HOST_NAME")
+	backendHostName := viper.GetString("BackendHostName")
+
+	// BackendServicePort
+	viper.SetDefault("BackendServicePort", 80)
+	viper.BindEnv("BackendServicePort", "AIRBAG_BACKEND_SERVICE_PORT")
+	backendServicePort := viper.GetInt("BackendServicePort")
+
+	backendURL, err := url.Parse(fmt.Sprintf("http://%s:%v", backendHostName, backendServicePort))
 	if err != nil {
 		return nil, fmt.Errorf("Error while parsing backend url: %v", err)
 	}
 
-	unAuthPathStrs := viper.GetStringSlice("UnauthenticatedPaths")
+	viper.BindEnv("UnauthenticatedRoutes", "AIRBAG_UNAUTHENTICATED_ROUTES")
+	unAuthPathStrs := viper.GetStringSlice("UnauthenticatedRoutes")
 	unAuthPaths := make([]*regexp.Regexp, len(unAuthPathStrs))
 	for i, str := range unAuthPathStrs {
 		unAuthPaths[i] = regexp.MustCompile(str)
@@ -72,10 +83,10 @@ func Init() (*Config, error) {
 	}
 
 	cfg := &Config{
-		Port:                 port,
-		BackendURL:           backendURL,
-		JWTProviders:         providers,
-		UnauthenticatedPaths: unAuthPaths,
+		Port:                  port,
+		BackendURL:            backendURL,
+		JWTProviders:          providers,
+		UnauthenticatedRoutes: unAuthPaths,
 	}
 	return cfg, nil
 }
