@@ -21,7 +21,7 @@ commands:
           working_directory: /tmp
           command: |
             mkdir -p airbag
-            docker save -o airbag/<< parameters.imageName >>.tar << parameters.imageName >>
+            docker save -o airbag/<< parameters.imageName >>.tar soluto/<< parameters.imageName >>
 
       - persist_to_workspace:
           root: /tmp/airbag
