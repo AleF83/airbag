@@ -44,7 +44,7 @@ jobs:
 
     steps:
       - build_image:
-          imageName: e2e
+          imageName: airbag-e2e
           workingDirectory: ./e2e
 
   run_tests:
@@ -62,7 +62,7 @@ jobs:
           working_directory: /tmp/airbag
           command: |
             docker load < airbag.tar
-            docker load < e2e.tar
+            docker load < airbag-e2e.tar
 
       - run:
           name: Run E2E tests

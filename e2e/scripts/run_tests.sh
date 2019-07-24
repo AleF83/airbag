@@ -37,14 +37,14 @@ report_error_and_exit() {
 
 build_images() {
     echo "Building images..."
-    docker build -t airbag '../src'
-    docker build -t e2e '.'
+    docker build -t soluto/airbag '../src'
+    docker build -t soluto/airbag-e2e '.'
 }
 
 load_images() {
     echo "Loading images to cluster..."
-    kind load docker-image --name "$CLUSTER_NAME" airbag
-    kind load docker-image --name "$CLUSTER_NAME" e2e
+    kind load docker-image --name "$CLUSTER_NAME" soluto/airbag
+    kind load docker-image --name "$CLUSTER_NAME" soluto/airbag-e2e
 }
 
 prepare_environment() {

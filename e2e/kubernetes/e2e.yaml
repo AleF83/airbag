@@ -11,7 +11,7 @@ spec:
       restartPolicy: Never
       containers:
       - name: e2e
-        image: e2e
+        image: soluto/airbag-e2e
         imagePullPolicy: Never
         env:
           - name: TOKEN_ENDPOINT
